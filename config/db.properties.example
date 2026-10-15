@@ -1,0 +1,18 @@
+# ====================================================================
+# Configuration Template for Student Placement Management System
+# ====================================================================
+# Copy this file to config/db.properties and set your local database credentials.
+
+# Application Server Port
+server.port=8086
+
+# Oracle Database JDBC URL
+# Format: jdbc:oracle:thin:@<host>:<port>:<sid_or_service>
+db.url=jdbc:oracle:thin:@localhost:1521:xe
+
+# Database Credentials
+db.user=PLACEMENT_USER
+db.password=YOUR_ORACLE_PASSWORD
+
+# Oracle JDBC Driver class
+db.driver=oracle.jdbc.OracleDriver

@@ -1,0 +1,739 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Placement Portal | Student Placement Management System</title>
+    <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+
+    <!-- 1. Redesigned Professional Login Screen -->
+    <div id="loginOverlay">
+        <div class="auth-modal-card">
+            <div class="auth-header-strip">
+                <div class="auth-logo-badge">PMS</div>
+                <h2>Student Placement Portal</h2>
+                <p>DBMS PAT-4 Practical Project &bull; Oracle Database XE</p>
+            </div>
+
+            <div class="auth-body-form">
+                <div id="loginAlert" class="alert-feedback alert-error"></div>
+
+                <form id="loginForm">
+                    <div class="form-field-group" style="margin-bottom: 1.2rem;">
+                        <label for="loginUsername">
+                            <span>Portal Username</span>
+                            <span class="required-star">*</span>
+                        </label>
+                        <input type="text" id="loginUsername" placeholder="e.g. admin or officer" required autocomplete="username">
+                    </div>
+
+                    <div class="form-field-group" style="margin-bottom: 1.5rem;">
+                        <label for="loginPassword">
+                            <span>Password</span>
+                            <span class="required-star">*</span>
+                        </label>
+                        <input type="password" id="loginPassword" placeholder="Enter password" required autocomplete="current-password">
+                    </div>
+
+                    <button type="submit" id="btnSignIn" class="btn-action btn-teal" style="width: 100%; padding: 12px; font-size: 0.95rem;">
+                        <span id="signInBtnText">Sign In to Dashboard &rarr;</span>
+                    </button>
+                </form>
+
+                <div class="auth-notice-box">
+                    <strong>Oracle DB Credentials (USERS Table):</strong><br>
+                    &bull; <code>admin</code> / <code>admin123</code> &mdash; Placement Director (Admin)<br>
+                    &bull; <code>officer</code> / <code>officer123</code> &mdash; Placement Officer
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 2. Distinct Top App Bar (Header) -->
+    <header class="top-appbar">
+        <div class="top-appbar-inner">
+            <div class="brand-section">
+                <div class="brand-icon-box">PMS</div>
+                <div class="brand-titles">
+                    <h1>Student Placement Management System</h1>
+                    <p>Department of Computer Science & Engineering &bull; DBMS PAT-4</p>
+                </div>
+            </div>
+
+            <div class="top-user-panel">
+                <div class="user-status-card">
+                    <div class="user-avatar-circle" id="userAvatar">A</div>
+                    <div class="user-meta-info">
+                        <span class="user-name-text" id="userNameDisplay">Placement Director</span>
+                        <span class="user-role-pill" id="userRoleDisplay">ADMIN</span>
+                    </div>
+                </div>
+                <button class="btn-signout" id="btnLogout">Sign Out</button>
+            </div>
+        </div>
+    </header>
+
+    <!-- 3. Clean Single-Row Compact Navigation Bar -->
+    <nav class="main-navbar">
+        <div class="navbar-container">
+            <button class="nav-tab-link active" data-tab="tab-dashboard">
+                <span>Dashboard</span>
+            </button>
+            <button class="nav-tab-link" data-tab="tab-students">
+                <span>Students</span>
+                <span class="nav-tab-badge" id="navBadgeStudents">0</span>
+            </button>
+            <button class="nav-tab-link" data-tab="tab-drives">
+                <span>Companies & Drives</span>
+                <span class="nav-tab-badge" id="navBadgeDrives">0</span>
+            </button>
+            <button class="nav-tab-link" data-tab="tab-eligibility">
+                <span>Eligibility Engine</span>
+            </button>
+            <button class="nav-tab-link" data-tab="tab-applications">
+                <span>Apply Drive</span>
+            </button>
+            <button class="nav-tab-link" data-tab="tab-view-apps">
+                <span>Applications Directory</span>
+                <span class="nav-tab-badge" id="navBadgeApps">0</span>
+            </button>
+            <button class="nav-tab-link" data-tab="tab-sql">
+                <span>SQL Workbench</span>
+            </button>
+            <button class="nav-tab-link" data-tab="tab-database">
+                <span>DB Connectivity</span>
+            </button>
+        </div>
+    </nav>
+
+    <!-- 4. Application Viewport Main Body -->
+    <main class="app-viewport">
+
+        <!-- ==========================================
+             MODULE 1: DASHBOARD
+             ========================================== -->
+        <section id="tab-dashboard" class="tab-pane active">
+            <!-- Hero Welcome Card -->
+            <div class="hero-welcome-card">
+                <h3>Welcome to the Campus Placement Management Portal</h3>
+                <p>
+                    A centralized DBMS practical platform for managing student recruitment lifecycles, evaluating real-time academic eligibility against corporate recruitment standards, and tracking drive offers through an Oracle Database XE backend.
+                </p>
+                <div class="hero-action-buttons">
+                    <button class="btn-action btn-teal" onclick="switchTab('tab-students')">+ Register New Student</button>
+                    <button class="btn-action btn-ghost-white" onclick="switchTab('tab-eligibility')">Run Eligibility Evaluation</button>
+                    <button class="btn-action btn-ghost-white" onclick="switchTab('tab-sql')">Open SQL Workbench</button>
+                </div>
+            </div>
+
+            <!-- Real-Time Database Metrics Cards -->
+            <div class="kpi-metrics-grid">
+                <div class="kpi-card">
+                    <div class="kpi-top-row">
+                        <span class="kpi-label">Registered Students</span>
+                        <span class="kpi-badge">STUDENTS</span>
+                    </div>
+                    <div class="kpi-value" id="statStudents">0</div>
+                    <div class="kpi-caption">Active academic candidate profiles</div>
+                </div>
+
+                <div class="kpi-card kpi-placed">
+                    <div class="kpi-top-row">
+                        <span class="kpi-label">Placed Students</span>
+                        <span class="kpi-badge">OFFERED</span>
+                    </div>
+                    <div class="kpi-value" id="statPlaced">0</div>
+                    <div class="kpi-caption">Confirmed recruitment offers accepted</div>
+                </div>
+
+                <div class="kpi-card kpi-companies">
+                    <div class="kpi-top-row">
+                        <span class="kpi-label">Partner Companies</span>
+                        <span class="kpi-badge">CORPORATE</span>
+                    </div>
+                    <div class="kpi-value" id="statCompanies">0</div>
+                    <div class="kpi-caption">Registered enterprise employers</div>
+                </div>
+
+                <div class="kpi-card kpi-apps">
+                    <div class="kpi-top-row">
+                        <span class="kpi-label">Total Applications</span>
+                        <span class="kpi-badge">APPLICATIONS</span>
+                    </div>
+                    <div class="kpi-value" id="statApplications">0</div>
+                    <div class="kpi-caption">Student drive submissions recorded</div>
+                </div>
+            </div>
+
+            <!-- Dashboard Activity & Architecture Summary -->
+            <div class="activity-summary-grid">
+                <div class="surface-panel">
+                    <div class="surface-header">
+                        <div>
+                            <div class="surface-title">Placement Workflow & System Capabilities</div>
+                            <div class="surface-subtitle">End-to-end data processing mapped to Oracle XE schema</div>
+                        </div>
+                    </div>
+                    <div style="font-size: 0.9rem; color: var(--slate-600); line-height: 1.7;">
+                        <p style="margin-bottom: 0.8rem;">
+                            &bull; <strong>Candidate Profiling:</strong> Captures Register Numbers, Degree Department, CGPA scores, and standing backlog counts under strict integrity constraints.
+                        </p>
+                        <p style="margin-bottom: 0.8rem;">
+                            &bull; <strong>Corporate Drives:</strong> Schedules drives with salary packages (LPA), minimum CGPA cutoffs, and maximum allowable backlog tolerances.
+                        </p>
+                        <p style="margin-bottom: 0.8rem;">
+                            &bull; <strong>Eligibility Engine:</strong> Automatically evaluates student records against company criteria upon application submission, flagging candidates as <code>ELIGIBLE</code> or <code>NOT ELIGIBLE</code>.
+                        </p>
+                        <p>
+                            &bull; <strong>Application Lifecycle:</strong> Supports workflow status transitions (<code>APPLIED</code> &rarr; <code>SHORTLISTED</code> &rarr; <code>PLACED</code> or <code>REJECTED</code>), updating the core student status synchronously.
+                        </p>
+                    </div>
+                </div>
+
+                <div class="surface-panel">
+                    <div class="surface-header">
+                        <div>
+                            <div class="surface-title">System Environment</div>
+                            <div class="surface-subtitle">Active connection status</div>
+                        </div>
+                    </div>
+                    <div style="font-size: 0.86rem; color: var(--slate-600); line-height: 1.8;">
+                        <div><strong>Backend Server:</strong> Java Built-in HttpServer</div>
+                        <div><strong>Network Port:</strong> <code>8086</code></div>
+                        <div><strong>Database:</strong> Oracle Database XE 11g</div>
+                        <div><strong>JDBC Driver:</strong> Oracle Thin Client (<code>ojdbc6.jar</code>)</div>
+                        <div><strong>Database User:</strong> <code>PLACEMENT_USER</code></div>
+                        <div style="margin-top: 14px;">
+                            <button class="btn-action btn-soft btn-compact" onclick="switchTab('tab-database')">View Connection Panel &rarr;</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ==========================================
+             MODULE 2: STUDENT DETAILS
+             ========================================== -->
+        <section id="tab-students" class="tab-pane">
+            <div class="page-header-banner">
+                <div class="page-title-group">
+                    <h2>Student Registration & Records</h2>
+                    <p>Register new undergraduate candidates and review student records stored in Oracle XE</p>
+                </div>
+                <span class="header-tag-pill">TABLE: STUDENTS</span>
+            </div>
+
+            <!-- Add Student Form Panel -->
+            <div class="surface-panel">
+                <div class="surface-header">
+                    <div>
+                        <div class="surface-title">+ Add New Student Record (DML: INSERT)</div>
+                        <div class="surface-subtitle">Values validated and inserted using parameterized PreparedStatement</div>
+                    </div>
+                </div>
+                <div id="studentAlert" class="alert-feedback"></div>
+                <form id="studentForm">
+                    <div class="form-layout-grid">
+                        <div class="form-field-group">
+                            <label><span>Register Number</span><span class="required-star">*</span></label>
+                            <input type="text" id="stuRegNo" placeholder="e.g. 23BCSE107" required>
+                        </div>
+                        <div class="form-field-group">
+                            <label><span>Student Full Name</span><span class="required-star">*</span></label>
+                            <input type="text" id="stuName" placeholder="e.g. Vikrant Mehra" required>
+                        </div>
+                        <div class="form-field-group">
+                            <label><span>Academic Department</span><span class="required-star">*</span></label>
+                            <select id="stuDept" required>
+                                <option value="Computer Science">Computer Science</option>
+                                <option value="Information Tech">Information Tech</option>
+                                <option value="Electronics and Comm">Electronics and Comm</option>
+                                <option value="Mechanical Engg">Mechanical Engg</option>
+                            </select>
+                        </div>
+                        <div class="form-field-group">
+                            <label><span>CGPA (0.00 to 10.00)</span><span class="required-star">*</span></label>
+                            <input type="number" id="stuCgpa" step="0.01" min="0" max="10" placeholder="e.g. 8.45" required>
+                        </div>
+                        <div class="form-field-group">
+                            <label><span>Standing Backlogs</span><span class="required-star">*</span></label>
+                            <input type="number" id="stuBacklogs" min="0" max="20" value="0" required>
+                        </div>
+                        <div class="form-field-group">
+                            <label><span>Email Address</span><span class="required-star">*</span></label>
+                            <input type="email" id="stuEmail" placeholder="e.g. vikrant.m@campus.edu" required>
+                        </div>
+                        <div class="form-field-group">
+                            <label><span>Phone Contact</span></label>
+                            <input type="tel" id="stuPhone" placeholder="e.g. 9811223344">
+                        </div>
+                    </div>
+                    <button type="submit" class="btn-action btn-teal">Save Student to Oracle DB</button>
+                </form>
+            </div>
+
+            <!-- Student List Table Panel -->
+            <div class="surface-panel">
+                <div class="surface-header">
+                    <div>
+                        <div class="surface-title">Registered Students Directory (DQL: SELECT * FROM STUDENTS)</div>
+                        <div class="surface-subtitle">Live records queried from PLACEMENT_USER.STUDENTS</div>
+                    </div>
+                    <button class="btn-action btn-soft btn-compact" onclick="loadStudents()">Refresh Directory</button>
+                </div>
+                <div class="data-table-wrapper">
+                    <table class="data-table" id="studentsTable">
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Reg No</th>
+                                <th>Student Name</th>
+                                <th>Department</th>
+                                <th>CGPA</th>
+                                <th>Backlogs</th>
+                                <th>Email</th>
+                                <th>Phone</th>
+                                <th>Placement Status</th>
+                            </tr>
+                        </thead>
+                        <tbody></tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
+
+        <!-- ==========================================
+             MODULE 3: COMPANIES & DRIVES
+             ========================================== -->
+        <section id="tab-drives" class="tab-pane">
+            <div class="page-header-banner">
+                <div class="page-title-group">
+                    <h2>Partner Companies & Placement Drives</h2>
+                    <p>Manage corporate partner profiles and schedule campus recruitment drives</p>
+                </div>
+                <span class="header-tag-pill">TABLES: COMPANIES, PLACEMENT_DRIVES</span>
+            </div>
+
+            <!-- Register Company Form -->
+            <div class="surface-panel">
+                <div class="surface-header">
+                    <div>
+                        <div class="surface-title">Register Partner Company Profile (DML: INSERT)</div>
+                        <div class="surface-subtitle">Stores employer corporate profiles into Oracle XE</div>
+                    </div>
+                </div>
+                <div id="companyAlert" class="alert-feedback"></div>
+                <form id="companyForm">
+                    <div class="form-layout-grid">
+                        <div class="form-field-group">
+                            <label><span>Company Name</span><span class="required-star">*</span></label>
+                            <input type="text" id="compName" placeholder="e.g. Cisco Systems" required>
+                        </div>
+                        <div class="form-field-group">
+                            <label><span>Industry Domain</span><span class="required-star">*</span></label>
+                            <input type="text" id="compIndustry" placeholder="e.g. Networking & Cloud" required>
+                        </div>
+                        <div class="form-field-group">
+                            <label><span>Job Location</span><span class="required-star">*</span></label>
+                            <input type="text" id="compLocation" placeholder="e.g. Bengaluru" required>
+                        </div>
+                        <div class="form-field-group">
+                            <label><span>HR Contact Email</span></label>
+                            <input type="email" id="compEmail" placeholder="e.g. campus@cisco.com">
+                        </div>
+                        <div class="form-field-group">
+                            <label><span>HR Phone</span></label>
+                            <input type="text" id="compPhone" placeholder="e.g. 080-44556677">
+                        </div>
+                        <div class="form-field-group">
+                            <label><span>Official Website</span></label>
+                            <input type="text" id="compWebsite" placeholder="e.g. www.cisco.com">
+                        </div>
+                    </div>
+                    <button type="submit" class="btn-action btn-teal">Register Company</button>
+                </form>
+            </div>
+
+            <!-- Schedule Drive Form -->
+            <div class="surface-panel">
+                <div class="surface-header">
+                    <div>
+                        <div class="surface-title">Schedule Placement Drive (DML: INSERT)</div>
+                        <div class="surface-subtitle">Defines salary package and academic eligibility cutoffs</div>
+                    </div>
+                </div>
+                <div id="driveAlert" class="alert-feedback"></div>
+                <form id="driveForm">
+                    <div class="form-layout-grid">
+                        <div class="form-field-group">
+                            <label><span>Participating Company</span><span class="required-star">*</span></label>
+                            <select id="driveCompanySelect" required>
+                                <option value="">-- Select Company --</option>
+                            </select>
+                        </div>
+                        <div class="form-field-group">
+                            <label><span>Job Designation / Role</span><span class="required-star">*</span></label>
+                            <input type="text" id="driveRole" placeholder="e.g. Associate Software Engineer" required>
+                        </div>
+                        <div class="form-field-group">
+                            <label><span>Salary Package (LPA)</span><span class="required-star">*</span></label>
+                            <input type="number" id="drivePackage" step="0.1" min="1" placeholder="e.g. 9.5" required>
+                        </div>
+                        <div class="form-field-group">
+                            <label><span>Minimum CGPA Requirement</span><span class="required-star">*</span></label>
+                            <input type="number" id="driveMinCgpa" step="0.1" min="0" max="10" placeholder="e.g. 8.0" required>
+                        </div>
+                        <div class="form-field-group">
+                            <label><span>Max Standing Backlogs Allowed</span><span class="required-star">*</span></label>
+                            <input type="number" id="driveMaxBacklogs" min="0" value="0" required>
+                        </div>
+                        <div class="form-field-group">
+                            <label><span>Drive Scheduled Date</span><span class="required-star">*</span></label>
+                            <input type="date" id="driveDate" required>
+                        </div>
+                    </div>
+                    <button type="submit" class="btn-action btn-teal">Schedule Drive</button>
+                </form>
+            </div>
+
+            <!-- Active Drives Table -->
+            <div class="surface-panel">
+                <div class="surface-header">
+                    <div>
+                        <div class="surface-title">Active Campus Placement Drives (DQL: Multi-Table JOIN)</div>
+                        <div class="surface-subtitle">Relational join of COMPANIES and PLACEMENT_DRIVES</div>
+                    </div>
+                    <button class="btn-action btn-soft btn-compact" onclick="loadDrives()">Refresh Drives</button>
+                </div>
+                <div class="data-table-wrapper">
+                    <table class="data-table" id="drivesTable">
+                        <thead>
+                            <tr>
+                                <th>Drive ID</th>
+                                <th>Company Name</th>
+                                <th>Job Role</th>
+                                <th>Package (LPA)</th>
+                                <th>Min CGPA</th>
+                                <th>Max Backlogs</th>
+                                <th>Drive Date</th>
+                                <th>Status</th>
+                            </tr>
+                        </thead>
+                        <tbody></tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
+
+        <!-- ==========================================
+             MODULE 4: ELIGIBILITY CHECK ENGINE
+             ========================================== -->
+        <section id="tab-eligibility" class="tab-pane">
+            <div class="page-header-banner">
+                <div class="page-title-group">
+                    <h2>Student Eligibility Processing Engine</h2>
+                    <p>Automated DBMS business logic checking student metrics against drive prerequisites</p>
+                </div>
+                <span class="header-tag-pill">BUSINESS LOGIC</span>
+            </div>
+
+            <div class="surface-panel">
+                <div class="surface-header">
+                    <div>
+                        <div class="surface-title">Check Student Candidacy for Drive</div>
+                        <div class="surface-subtitle">Pulls candidate and drive records to perform CGPA & backlog validation</div>
+                    </div>
+                </div>
+
+                <div class="form-layout-grid">
+                    <div class="form-field-group">
+                        <label><span>Select Registered Student</span><span class="required-star">*</span></label>
+                        <select id="eligStudentSelect">
+                            <option value="">-- Choose Student --</option>
+                        </select>
+                    </div>
+                    <div class="form-field-group">
+                        <label><span>Select Placement Drive</span><span class="required-star">*</span></label>
+                        <select id="eligDriveSelect">
+                            <option value="">-- Choose Drive --</option>
+                        </select>
+                    </div>
+                </div>
+
+                <button class="btn-action btn-teal" onclick="checkEligibility()">Evaluate Eligibility Now</button>
+
+                <!-- Verdict Result Box -->
+                <div id="eligibilityResult" class="eligibility-verdict-box">
+                    <div class="verdict-heading" id="eligStatusTitle"></div>
+                    <div class="verdict-explanation" id="eligReason"></div>
+                    <div class="verdict-metrics-table" id="eligDetails"></div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ==========================================
+             MODULE 5: PLACEMENT APPLICATIONS
+             ========================================== -->
+        <section id="tab-applications" class="tab-pane">
+            <div class="page-header-banner">
+                <div class="page-title-group">
+                    <h2>Submit Placement Application</h2>
+                    <p>Record a student's formal candidacy for an active recruitment drive</p>
+                </div>
+                <span class="header-tag-pill">TABLE: PLACEMENT_APPLICATIONS</span>
+            </div>
+
+            <div class="surface-panel">
+                <div class="surface-header">
+                    <div>
+                        <div class="surface-title">Apply for Placement Drive (DML: INSERT)</div>
+                        <div class="surface-subtitle">The backend computes and stores eligibility status synchronously</div>
+                    </div>
+                </div>
+                <div id="appAlert" class="alert-feedback"></div>
+                <form id="applyForm">
+                    <div class="form-layout-grid">
+                        <div class="form-field-group">
+                            <label><span>Student Candidate</span><span class="required-star">*</span></label>
+                            <select id="applyStudentSelect" required>
+                                <option value="">-- Select Student --</option>
+                            </select>
+                        </div>
+                        <div class="form-field-group">
+                            <label><span>Recruitment Drive</span><span class="required-star">*</span></label>
+                            <select id="applyDriveSelect" required>
+                                <option value="">-- Select Drive --</option>
+                            </select>
+                        </div>
+                        <div class="form-field-group" style="grid-column: 1 / -1;">
+                            <label><span>Application Remarks / Notes</span></label>
+                            <input type="text" id="applyRemarks" placeholder="e.g. Candidate completed Cloud Computing elective">
+                        </div>
+                    </div>
+                    <button type="submit" class="btn-action btn-teal">Submit Application</button>
+                </form>
+            </div>
+        </section>
+
+        <!-- ==========================================
+             MODULE 6: VIEW APPLICATIONS DIRECTORY
+             ========================================== -->
+        <section id="tab-view-apps" class="tab-pane">
+            <div class="page-header-banner">
+                <div class="page-title-group">
+                    <h2>Placement Applications Directory</h2>
+                    <p>Comprehensive overview of submitted applications across candidates and companies</p>
+                </div>
+                <span class="header-tag-pill">RELATIONAL JOIN: 4 TABLES</span>
+            </div>
+
+            <div class="surface-panel">
+                <div class="surface-header">
+                    <div>
+                        <div class="surface-title">All Registered Applications (DQL: Multi-Table JOIN)</div>
+                        <div class="surface-subtitle">Query joining STUDENTS, PLACEMENT_DRIVES, and COMPANIES</div>
+                    </div>
+                    <button class="btn-action btn-soft btn-compact" onclick="loadApplications()">Refresh Directory</button>
+                </div>
+                <div class="data-table-wrapper">
+                    <table class="data-table" id="applicationsTable">
+                        <thead>
+                            <tr>
+                                <th>App ID</th>
+                                <th>Student Name</th>
+                                <th>Reg No</th>
+                                <th>CGPA</th>
+                                <th>Company</th>
+                                <th>Job Role</th>
+                                <th>Package</th>
+                                <th>Min CGPA</th>
+                                <th>Eligibility</th>
+                                <th>Status</th>
+                                <th>Remarks</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody></tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
+
+        <!-- ==========================================
+             MODULE 7: REORGANIZED SQL WORKBENCH
+             ========================================== -->
+        <section id="tab-sql" class="tab-pane">
+            <div class="page-header-banner">
+                <div class="page-title-group">
+                    <h2>DBMS SQL Demonstration Workbench</h2>
+                    <p>Interactive demonstration of DDL, DML, DQL, JOINs, and GROUP BY on Oracle Database XE</p>
+                </div>
+                <span class="header-tag-pill">PAT-4 CURRICULUM</span>
+            </div>
+
+            <div class="sql-workbench-card">
+                <!-- Visual Categorized Tabs -->
+                <div class="sql-category-nav">
+                    <button class="sql-cat-btn active" onclick="switchSqlTab('sql-ddl')">1. DDL (Definition)</button>
+                    <button class="sql-cat-btn" onclick="switchSqlTab('sql-dml')">2. DML (Manipulation)</button>
+                    <button class="sql-cat-btn" onclick="switchSqlTab('sql-dql')">3. DQL (Query & Filter)</button>
+                    <button class="sql-cat-btn" onclick="switchSqlTab('sql-join')">4. Multi-Table JOINs</button>
+                    <button class="sql-cat-btn" onclick="switchSqlTab('sql-group')">5. GROUP BY & Aggregation</button>
+                </div>
+
+                <!-- 1. DDL Panel -->
+                <div id="sql-ddl" class="sql-module-panel active">
+                    <div class="module-header-title">Data Definition Language (DDL)</div>
+                    <div class="module-header-desc">Schema modification commands: creating, altering, and dropping table structures. Click a preset to review in the editor:</div>
+                    <div class="preset-pills-container">
+                        <button class="query-preset-pill" onclick="loadSqlPreset('CREATE TABLE PLACEMENT_CERTIFICATES (CERT_ID NUMBER PRIMARY KEY, STUDENT_ID NUMBER NOT NULL, CERT_NAME VARCHAR2(100) NOT NULL, ISSUING_BODY VARCHAR2(100), ISSUE_DATE DATE)')">CREATE TABLE (Certificates)</button>
+                        <button class="query-preset-pill" onclick="loadSqlPreset('ALTER TABLE STUDENTS ADD (PROJECT_TOPIC VARCHAR2(120))')">ALTER TABLE (Add Column)</button>
+                        <button class="query-preset-pill" onclick="loadSqlPreset('ALTER TABLE STUDENTS MODIFY (PROJECT_TOPIC VARCHAR2(180))')">ALTER TABLE (Modify Column)</button>
+                        <button class="query-preset-pill" onclick="loadSqlPreset('DROP TABLE PLACEMENT_CERTIFICATES')">DROP TABLE (Disposable Demo Table)</button>
+                    </div>
+                </div>
+
+                <!-- 2. DML Panel -->
+                <div id="sql-dml" class="sql-module-panel">
+                    <div class="module-header-title">Data Manipulation Language (DML)</div>
+                    <div class="module-header-desc">Data row manipulation commands: inserting, updating, and removing individual rows:</div>
+                    <div class="preset-pills-container">
+                        <button class="query-preset-pill" onclick="loadSqlPreset('INSERT INTO STUDENTS (STUDENT_ID, REGISTER_NO, NAME, DEPARTMENT, CGPA, BACKLOGS, EMAIL, PHONE, STATUS) VALUES (STUDENTS_SEQ.NEXTVAL, \'23BCSE205\', \'Tanvi Deshmukh\', \'Computer Science\', 8.95, 0, \'tanvi.d@campus.edu\', \'9811223344\', \'UNPLACED\')')">INSERT (Student Record)</button>
+                        <button class="query-preset-pill" onclick="loadSqlPreset('UPDATE STUDENTS SET STATUS = \'PLACED\' WHERE REGISTER_NO = \'23BCSE103\'')">UPDATE (Mark Student Placed)</button>
+                        <button class="query-preset-pill" onclick="loadSqlPreset('UPDATE PLACEMENT_APPLICATIONS SET REMARKS = \'Approved by Selection Board\' WHERE APPLICATION_ID = 1')">UPDATE (Application Remarks)</button>
+                        <button class="query-preset-pill" onclick="loadSqlPreset('DELETE FROM STUDENTS WHERE REGISTER_NO = \'23BCSE205\'')">DELETE (Controlled Safe Record)</button>
+                    </div>
+                </div>
+
+                <!-- 3. DQL Panel -->
+                <div id="sql-dql" class="sql-module-panel">
+                    <div class="module-header-title">Data Query Language (DQL)</div>
+                    <div class="module-header-desc">Data retrieval queries with sorting (ORDER BY) and logical filtering (WHERE):</div>
+                    <div class="preset-pills-container">
+                        <button class="query-preset-pill" onclick="loadSqlPreset('SELECT STUDENT_ID, REGISTER_NO, NAME, DEPARTMENT, CGPA, STATUS FROM STUDENTS ORDER BY CGPA DESC')">SELECT + ORDER BY (Top CGPA)</button>
+                        <button class="query-preset-pill" onclick="loadSqlPreset('SELECT REGISTER_NO, NAME, CGPA, BACKLOGS FROM STUDENTS WHERE CGPA >= 8.0 AND BACKLOGS = 0')">WHERE (Honor Roll Filter)</button>
+                        <button class="query-preset-pill" onclick="loadSqlPreset('SELECT COMPANY_NAME, INDUSTRY, LOCATION, HR_EMAIL FROM COMPANIES ORDER BY COMPANY_NAME ASC')">SELECT (Partner Companies)</button>
+                        <button class="query-preset-pill" onclick="loadSqlPreset('SELECT JOB_ROLE, PACKAGE_LPA, MIN_CGPA, DRIVE_DATE FROM PLACEMENT_DRIVES WHERE PACKAGE_LPA >= 8.0 ORDER BY PACKAGE_LPA DESC')">WHERE + ORDER BY (High Package)</button>
+                    </div>
+                </div>
+
+                <!-- 4. JOIN Panel -->
+                <div id="sql-join" class="sql-module-panel">
+                    <div class="module-header-title">Relational Multi-Table JOIN Queries</div>
+                    <div class="module-header-desc">Connecting records across primary and foreign key constraints:</div>
+                    <div class="preset-pills-container">
+                        <button class="query-preset-pill" onclick="loadSqlPreset('SELECT d.DRIVE_ID, c.COMPANY_NAME, c.LOCATION, d.JOB_ROLE, d.PACKAGE_LPA, d.MIN_CGPA FROM PLACEMENT_DRIVES d JOIN COMPANIES c ON d.COMPANY_ID = c.COMPANY_ID ORDER BY d.PACKAGE_LPA DESC')">INNER JOIN (Drives & Companies)</button>
+                        <button class="query-preset-pill" onclick="loadSqlPreset('SELECT a.APPLICATION_ID, s.NAME AS STUDENT, s.CGPA, c.COMPANY_NAME, d.JOB_ROLE, d.PACKAGE_LPA, a.ELIGIBILITY_STATUS, a.STATUS FROM PLACEMENT_APPLICATIONS a JOIN STUDENTS s ON a.STUDENT_ID = s.STUDENT_ID JOIN PLACEMENT_DRIVES d ON a.DRIVE_ID = d.DRIVE_ID JOIN COMPANIES c ON d.COMPANY_ID = c.COMPANY_ID ORDER BY a.APPLICATION_ID DESC')">4-Table JOIN (Full Application Dossier)</button>
+                        <button class="query-preset-pill" onclick="loadSqlPreset('SELECT s.REGISTER_NO, s.NAME, a.APPLICATION_ID, a.STATUS FROM STUDENTS s LEFT JOIN PLACEMENT_APPLICATIONS a ON s.STUDENT_ID = a.STUDENT_ID')">LEFT OUTER JOIN (Students with/without Apps)</button>
+                    </div>
+                </div>
+
+                <!-- 5. GROUP BY Panel -->
+                <div id="sql-group" class="sql-module-panel">
+                    <div class="module-header-title">GROUP BY & Aggregate Functions</div>
+                    <div class="module-header-desc">Computing summary statistics using COUNT(), AVG(), MAX(), MIN(), and ROUND():</div>
+                    <div class="preset-pills-container">
+                        <button class="query-preset-pill" onclick="loadSqlPreset('SELECT c.COMPANY_NAME, COUNT(a.APPLICATION_ID) AS TOTAL_APPLICANTS, ROUND(AVG(s.CGPA), 2) AS AVG_STUDENT_CGPA FROM COMPANIES c JOIN PLACEMENT_DRIVES d ON c.COMPANY_ID = d.COMPANY_ID LEFT JOIN PLACEMENT_APPLICATIONS a ON d.DRIVE_ID = a.DRIVE_ID LEFT JOIN STUDENTS s ON a.STUDENT_ID = s.STUDENT_ID GROUP BY c.COMPANY_NAME ORDER BY TOTAL_APPLICANTS DESC')">GROUP BY Company (Applicant Stats)</button>
+                        <button class="query-preset-pill" onclick="loadSqlPreset('SELECT DEPARTMENT, COUNT(*) AS STUDENT_COUNT, ROUND(AVG(CGPA), 2) AS AVG_CGPA, MAX(CGPA) AS HIGHEST_CGPA FROM STUDENTS GROUP BY DEPARTMENT ORDER BY AVG_CGPA DESC')">GROUP BY Department (Academic Summary)</button>
+                        <button class="query-preset-pill" onclick="loadSqlPreset('SELECT STATUS, COUNT(*) AS APPS_COUNT FROM PLACEMENT_APPLICATIONS GROUP BY STATUS')">GROUP BY Application Status</button>
+                    </div>
+                </div>
+
+                <!-- Interactive SQL Code Canvas -->
+                <div class="sql-editor-container">
+                    <label style="font-size: 0.82rem; font-weight: 700; color: var(--navy-900); margin-bottom: 6px; display: block;">Interactive SQL Editor (Review and execute query):</label>
+                    <textarea id="sqlInput" class="sql-editor-textarea" placeholder="Select a preset above to load an SQL statement, or type your own query here..."></textarea>
+                    
+                    <div class="sql-actions-bar">
+                        <button class="btn-action btn-teal" id="btnRunSql" onclick="executeUserSql()">Execute SQL Query &rarr;</button>
+                        <button class="btn-action btn-soft" onclick="clearSqlEditor()">Clear Editor</button>
+                    </div>
+                </div>
+
+                <!-- Structured Results Table Canvas -->
+                <div id="sqlResultBox" style="margin-top: 1.6rem; display: none;">
+                    <div id="sqlMessage" class="alert-feedback"></div>
+                    <div class="data-table-wrapper">
+                        <table class="data-table" id="sqlResultTable">
+                            <thead id="sqlResultThead"></thead>
+                            <tbody id="sqlResultTbody"></tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ==========================================
+             MODULE 8: DATABASE CONNECTIVITY
+             ========================================== -->
+        <section id="tab-database" class="tab-pane">
+            <div class="page-header-banner">
+                <div class="page-title-group">
+                    <h2>Database Connectivity & Architecture</h2>
+                    <p>Live health and runtime integration between Java HttpServer and Oracle Database XE</p>
+                </div>
+                <span class="header-tag-pill">JDBC &bull; ORACLE XE</span>
+            </div>
+
+            <div class="db-status-hero">
+                <!-- Status Strip -->
+                <div class="status-indicator-strip" id="dbStatusCard">
+                    <div class="status-indicator-dot" id="dbStatusDot"></div>
+                    <div>
+                        <div class="status-indicator-title" id="dbStatusText">Checking Connection...</div>
+                        <div style="font-size: 0.86rem; color: var(--slate-600); margin-top: 4px;" id="dbDetailsText">
+                            Connecting to Oracle Database XE via JDBC Driver...
+                        </div>
+                    </div>
+                </div>
+
+                <div style="margin-bottom: 1.4rem;">
+                    <button class="btn-action btn-teal" onclick="checkDbHealth()">Test JDBC Connection Now &rarr;</button>
+                </div>
+
+                <h4 style="font-size: 1.05rem; font-weight: 800; color: var(--navy-900); margin-bottom: 0.8rem;">Technical Architecture & Integration Pipeline:</h4>
+
+                <div class="architecture-cards-grid">
+                    <div class="arch-node-card">
+                        <div class="arch-node-title">1. Frontend Layer</div>
+                        <div class="arch-node-desc">Vanilla HTML5, CSS3, and JavaScript Single Page Application. Communicates with backend endpoints via asynchronous Fetch API requests.</div>
+                    </div>
+
+                    <div class="arch-node-card">
+                        <div class="arch-node-title">2. Java HttpServer Backend</div>
+                        <div class="arch-node-desc">Lightweight native Java HTTP Server running on Port 8086. Dispatches REST requests, enforces business rules, and outputs structured terminal logs.</div>
+                    </div>
+
+                    <div class="arch-node-card">
+                        <div class="arch-node-title">3. JDBC Driver Layer</div>
+                        <div class="arch-node-desc">Oracle JDBC Thin Driver (ojdbc6.jar). Establishes optimized TCP/IP socket connections directly to Oracle listener without native client binaries.</div>
+                    </div>
+
+                    <div class="arch-node-card">
+                        <div class="arch-node-title">4. Oracle XE Database</div>
+                        <div class="arch-node-desc">Oracle Database 11g Express Edition on Port 1521. Schema: PLACEMENT_USER. Tables: STUDENTS, COMPANIES, DRIVES, APPLICATIONS, USERS.</div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- 5. Footer -->
+    <footer class="app-footer">
+        <div class="footer-inner">
+            <div>
+                <strong>Student Placement Management System</strong> &bull; Department of Computer Science & Engineering &bull; DBMS PAT-4
+            </div>
+            <div>
+                Backend: Java Built-in Server (Port 8086) &bull; Oracle Database XE 11g
+            </div>
+        </div>
+    </footer>
+
+    <!-- Application JavaScript Logic -->
+    <script src="js/app.js"></script>
+</body>
+</html>

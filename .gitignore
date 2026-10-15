@@ -1,0 +1,11 @@
+# Local configuration (passwords & environment-specific values)
+config/db.properties
+
+# Compiled Java class files
+bin/
+*.class
+
+# Temporary files & logs
+*.log
+.DS_Store
+Thumbs.db
