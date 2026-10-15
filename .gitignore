@@ -6,6 +6,7 @@ bin/
 *.class
 
 # Temporary files & logs
+scratch/
 *.log
 .DS_Store
 Thumbs.db
